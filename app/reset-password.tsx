@@ -1,15 +1,38 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { updatePassword } from "firebase/auth";
+import { auth } from "@services/firebase";
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSavePassword = async () => {
+    if (!password || password !== confirmPassword) return;
+    if (password.length < 6) {
+      Alert.alert("Weak Password", "Password must be at least 6 characters.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error("No authenticated user found.");
+      await updatePassword(currentUser, password);
+      Alert.alert("Success", "Your password has been updated.");
+      router.replace("/account-setup");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to update password. You may need to re-login.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View className="flex-1 bg-white">
@@ -55,11 +78,15 @@ export default function ResetPasswordScreen() {
               </View>
 
               <Pressable 
-                onPress={() => router.replace("/account-setup")}
-                disabled={!password || password !== confirmPassword}
+                onPress={handleSavePassword}
+                disabled={!password || password !== confirmPassword || loading}
                 className={`w-full py-5 rounded-2xl items-center mt-4 shadow-lg ${password && password === confirmPassword ? "bg-primary shadow-primary/20 active:bg-primary/90" : "bg-gray-200"}`}
               >
-                <Text className="text-white font-bold text-lg">Save Password</Text>
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text className="text-white font-bold text-lg">Save Password</Text>
+                )}
               </Pressable>
             </Animated.View>
           </View>

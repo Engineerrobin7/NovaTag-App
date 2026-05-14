@@ -54,10 +54,10 @@ export default function PairingScreen() {
       await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate connection time
       
       const newDevice = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 11),
         name: name,
         battery: 100,
-        status: "Nearby" as const,
+        status: "nearby" as const,
         lastSeen: "Just now",
         icon: "broadcast",
         color: "bg-primary",

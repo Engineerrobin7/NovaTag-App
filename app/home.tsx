@@ -158,7 +158,7 @@ export default function HomeScreen() {
                   </Animated.View>
                 ))
               ) : (
-                <View className="px-4 py-8 items-center justify-center w-[width-48]">
+                <View className="px-4 py-8 items-center justify-center" style={{ width: width - 48 }}>
                   <Text className="text-gray-400 italic">No devices paired yet</Text>
                 </View>
               )}
@@ -185,7 +185,6 @@ export default function HomeScreen() {
                 label="SOS" 
                 color="bg-red-500"
                 onPress={() => {
-                  const showToast = useToastStore.getState().show;
                   showToast("SOS Signal Broadcasted!", "error");
                   // In real app, we would loop through devices and call bleService.triggerBuzzer(d.id, true)
                 }} 

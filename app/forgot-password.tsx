@@ -1,14 +1,31 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "@services/firebase";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSendRecovery = async () => {
+    if (!email) return;
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert("Email Sent", "Check your inbox for a password reset link.");
+      router.push("/otp");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to send recovery email.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View className="flex-1 bg-white">
@@ -44,10 +61,15 @@ export default function ForgotPasswordScreen() {
               </View>
 
               <Pressable 
-                onPress={() => router.push("/otp")}
+                onPress={handleSendRecovery}
+                disabled={!email || loading}
                 className="bg-primary py-5 rounded-2xl items-center active:bg-primary/90 mt-4 shadow-lg shadow-primary/20"
               >
-                <Text className="text-white font-bold text-lg">Send Recovery Link</Text>
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text className="text-white font-bold text-lg">Send Recovery Link</Text>
+                )}
               </Pressable>
             </Animated.View>
           </View>

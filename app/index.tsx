@@ -8,14 +8,13 @@ import { View, ActivityIndicator } from "react-native";
 export default function Index() {
   const router = useRouter();
   const setUser = useAuthStore((state) => state.setUser);
-  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        // User is signed in, but we might need to fetch the full profile
-        // For now, if we already have the user in store, we're good
-        if (!user) {
+        // Only set a minimal profile if one doesn't already exist in the store
+        const currentUser = useAuthStore.getState().user;
+        if (!currentUser) {
           setUser({
             uid: firebaseUser.uid,
             email: firebaseUser.email || "",

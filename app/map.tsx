@@ -24,6 +24,9 @@ export default function MapScreen() {
   const devices = useDeviceStore((state) => state.devices);
   const mapRef = useRef<MapView>(null);
 
+  // Stable fallback coordinates per device (computed once, not on every render)
+  const fallbackCoords = useRef<Record<string, { lat: number; lng: number }>>({});
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -109,12 +112,21 @@ export default function MapScreen() {
         customMapStyle={mapStyle}
         showsUserLocation
       >
-        {devices.map(device => (
+        {devices.map(device => {
+          // Compute stable fallback coords once per device, not on every render
+          if (!fallbackCoords.current[device.id]) {
+            fallbackCoords.current[device.id] = {
+              lat: (userLocation?.latitude || 51.5074) + (Math.random() - 0.5) * 0.01,
+              lng: (userLocation?.longitude || -0.1278) + (Math.random() - 0.5) * 0.01,
+            };
+          }
+          const coords = fallbackCoords.current[device.id];
+          return (
           <Marker 
             key={device.id}
             coordinate={{ 
-              latitude: device.lat || (userLocation?.latitude || 51.5074) + (Math.random() - 0.5) * 0.01, 
-              longitude: device.lng || (userLocation?.longitude || -0.1278) + (Math.random() - 0.5) * 0.01 
+              latitude: device.lat || coords.lat, 
+              longitude: device.lng || coords.lng,
             }}
             onPress={() => setSelectedDevice(device)}
           >
@@ -127,7 +139,8 @@ export default function MapScreen() {
               <View className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-white" />
             </View>
           </Marker>
-        ))}
+          );
+        })}
 
         {userLocation && (
           <Circle 

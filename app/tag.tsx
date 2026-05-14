@@ -47,7 +47,7 @@ export default function TagDetailScreen() {
             <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center">
               <MaterialCommunityIcons name="chevron-left" size={28} color="black" />
             </Pressable>
-            <Pressable onPress={() => router.push("/device-settings")} className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center">
+            <Pressable onPress={() => router.push({ pathname: "/device-settings", params: { deviceId: device.id } })} className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center">
               <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" />
             </Pressable>
           </View>

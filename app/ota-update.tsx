@@ -23,7 +23,8 @@ export default function OTAUpdateScreen() {
   const showToast = useToastStore((state) => state.show);
 
   const [status, setStatus] = useState<"checking" | "ready" | "updating" | "verifying" | "success">("checking");
-  const [progress, setProgress] = useState(0);
+  const [progressDisplay, setProgressDisplay] = useState(0);
+  const progress = useSharedValue(0);
   const rotation = useSharedValue(0);
 
   useEffect(() => {
@@ -38,7 +39,8 @@ export default function OTAUpdateScreen() {
     let p = 0;
     const interval = setInterval(() => {
       p += 1;
-      setProgress(p);
+      progress.value = p;
+      setProgressDisplay(p);
       if (p >= 100) {
         clearInterval(interval);
         setStatus("verifying");
@@ -55,7 +57,7 @@ export default function OTAUpdateScreen() {
   }));
 
   const progressStyle = useAnimatedStyle(() => ({
-    width: `${progress}%`
+    width: `${progress.value}%` as any
   }));
 
   return (
@@ -112,7 +114,7 @@ export default function OTAUpdateScreen() {
               />
             </View>
             <Text className="text-black text-center font-bold text-xl">
-              {status === "updating" ? `Uploading... ${progress}%` : "Verifying Installation..."}
+              {status === "updating" ? `Uploading... ${progressDisplay}%` : "Verifying Installation..."}
             </Text>
             <Text className="text-red-500 text-center mt-4 text-sm font-semibold">
               Do not close the app or move the tag.

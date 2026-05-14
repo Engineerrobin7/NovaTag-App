@@ -64,7 +64,10 @@ class BLEService {
       "2A19"  // Battery Level Characteristic
     );
     
-    return batteryChar.value ? parseInt(batteryChar.value, 10) : 0;
+    // BLE characteristic values are base64-encoded; decode to get the uint8 battery %
+    if (!batteryChar.value) return 0;
+    const bytes = Buffer.from(batteryChar.value, "base64");
+    return bytes.readUInt8(0);
   }
 
   async triggerBuzzer(deviceId: string, active: boolean) {
