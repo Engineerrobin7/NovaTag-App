@@ -1,0 +1,20 @@
+node_modules
+.expo
+.expo-shared
+web-build
+*.log
+*.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.env
+.android
+.ios
+.vscode
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase-debug.log
+.firebase/

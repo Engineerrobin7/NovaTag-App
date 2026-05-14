@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "NovaTag",
+    "slug": "novatag-8a4d6",
+    "version": "1.0.0",
+    "scheme": "novatag",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "newArchEnabled": true,
+      "supportsTablet": true,
+      "bundleIdentifier": "com.novatag.app",
+      "infoPlist": {
+        "NSBluetoothAlwaysUsageDescription": "NovaTag uses Bluetooth to find and connect to your nearby tracking devices.",
+        "NSLocationWhenInUseUsageDescription": "NovaTag uses your location to show your devices on the map and provide precision finding.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "NovaTag uses your location to provide background tracking and anti-loss alerts.",
+        "UIBackgroundModes": [
+          "bluetooth-central",
+          "location",
+          "fetch",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "newArchEnabled": true,
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "package": "com.novatag.app",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "BLUETOOTH",
+        "BLUETOOTH_ADMIN",
+        "BLUETOOTH_SCAN",
+        "BLUETOOTH_CONNECT",
+        "BLUETOOTH_ADVERTISE"
+      ]
+    },
+    "plugins": [
+      "expo-font",
+      "expo-router"
+    ]
+  }
+}

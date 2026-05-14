@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is accessing their own data
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Devices Collection (NovaTags)
+    match /devices/{deviceId} {
+      // Allow reading if the user owns the device OR it's shared with them
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid || 
+        request.auth.uid in resource.data.sharedWith
+      );
+      
+      // Only the owner can create, update metadata, or delete
+      allow create: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+      
+      // Allow updating location/battery if shared or owner
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid || 
+        request.auth.uid in resource.data.sharedWith
+      ) && (
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['lastLocation', 'batteryLevel', 'lastSeen'])
+      );
+    }
+
+    // Alerts Collection
+    match /alerts/{alertId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Families Collection
+    match /families/{familyId} {
+      allow read: if isAuthenticated() && request.auth.uid in resource.data.members;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && request.auth.uid == resource.data.organizerId;
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.organizerId;
+    }
+  }
+}
