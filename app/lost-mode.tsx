@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { View, Text, Pressable, TextInput, Switch, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -81,83 +81,97 @@ export default function LostModeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-[#f7f9fc]"> {/* Material 3 Surface Tone */}
       <StatusBar style="dark" />
-      <SafeAreaView className="flex-1 px-8 pt-4" edges={["top"]}>
-        <View className="flex-row justify-between items-center mb-10">
-          <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center">
-            <MaterialCommunityIcons name="close" size={28} color="black" />
+      <SafeAreaView className="flex-1" edges={["top"]}>
+        
+        {/* Header */}
+        <View className="px-6 flex-row justify-between items-center h-16">
+          <Pressable 
+            onPress={() => router.back()} 
+            className="w-10 h-10 rounded-full bg-white shadow-sm items-center justify-center"
+          >
+            <MaterialCommunityIcons name="close" size={24} color="#1c1b1f" />
           </Pressable>
-          <Text className="text-black text-xl font-bold">Lost Mode</Text>
+          <Text className="text-[#1c1b1f] font-bold text-lg">Lost Mode</Text>
           <View className="w-10" />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View className="items-center mb-10">
-            <View className={`w-24 h-24 rounded-full ${isLost ? "bg-red-500" : "bg-gray-100"} items-center justify-center mb-6`}>
-              <MaterialCommunityIcons name="lock-alert" size={48} color={isLost ? "white" : "#ccc"} />
+        <ScrollView showsVerticalScrollIndicator={false} className="px-6">
+          <View className="items-center mt-6 mb-8">
+            <View className={`w-24 h-24 rounded-[32px] ${isLost ? "bg-[#ba1a1a]" : "bg-[#e8f0fe]"} items-center justify-center mb-6 shadow-sm`}>
+              <MaterialCommunityIcons name="lock-alert" size={48} color={isLost ? "white" : "#0066cc"} />
             </View>
-            <Text className="text-black text-2xl font-bold text-center">
+            <Text className="text-[#1c1b1f] text-2xl font-bold text-center">
               {isLost ? "Device is Locked" : "Secure Your Tag"}
             </Text>
-            <Text className="text-gray-400 text-center mt-2 px-4 leading-5">
+            <Text className="text-[#49454f] text-center mt-2 px-4 leading-5 text-sm">
               Lost Mode allows other NovaTag users to anonymously help you find your item.
             </Text>
           </View>
 
-          <View className="bg-gray-50 p-6 rounded-3xl flex-row items-center justify-between mb-8">
-            <View>
-              <Text className="text-black font-bold text-lg">Enable Lost Mode</Text>
-              <Text className="text-gray-400 text-xs">Notify when found & lock settings</Text>
+          {/* Toggle Card - Material 3 Style */}
+          <View className="bg-white p-6 rounded-[28px] flex-row items-center justify-between mb-6 shadow-sm">
+            <View className="flex-1 mr-4">
+              <Text className="text-[#1c1b1f] font-bold text-lg">Enable Lost Mode</Text>
+              <Text className="text-[#49454f] text-xs mt-0.5">Notify when found & lock settings</Text>
             </View>
             <Switch 
               value={isLost} 
               onValueChange={handleToggle}
-              trackColor={{ false: "#eee", true: "#ff3b30" }}
+              trackColor={{ false: "#e3e1e6", true: "#ba1a1a" }}
               thumbColor="white"
             />
           </View>
 
           {isLost && (
             <Animated.View entering={FadeInDown} className="space-y-6">
+              
+              {/* Found Location Alert */}
               {foundLocation && (
-                <View className="p-4 bg-green-50 rounded-2xl border border-green-100 flex-row items-center mb-2">
-                  <MaterialCommunityIcons name="map-marker-radius" size={24} color="#34c759" />
+                <View className="p-4 bg-[#e8f0fe] rounded-[24px] border border-[#c2e7ff] flex-row items-center">
+                  <MaterialCommunityIcons name="map-marker-radius" size={24} color="#0066cc" />
                   <View className="ml-3 flex-1">
-                    <Text className="text-green-800 font-bold">Location Found by Network!</Text>
-                    <Text className="text-green-600 text-xs">
+                    <Text className="text-[#0066cc] font-bold">Location Found by Network!</Text>
+                    <Text className="text-[#041e49] text-xs mt-0.5">
                       Lat: {foundLocation.latitude.toFixed(4)}, Lng: {foundLocation.longitude.toFixed(4)}
                     </Text>
                   </View>
                 </View>
               )}
-              <View>
-                <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest ml-1 mb-3">Recovery Phone</Text>
+
+              {/* Phone Input */}
+              <View className="bg-white p-6 rounded-[28px] shadow-sm">
+                <Text className="text-[#49454f] text-xs font-bold uppercase tracking-widest mb-3">Recovery Phone</Text>
                 <TextInput
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   placeholder="+1 234 567 890"
-                  className="bg-gray-50 p-5 rounded-2xl text-lg text-black border border-gray-100"
+                  className="bg-[#f3f4f9] p-4 rounded-xl text-lg text-[#1c1b1f]"
                   keyboardType="phone-pad"
+                  placeholderTextColor="#93909a"
                 />
               </View>
 
-              <View>
-                <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest ml-1 mb-3">Custom Message</Text>
+              {/* Message Input */}
+              <View className="bg-white p-6 rounded-[28px] shadow-sm">
+                <Text className="text-[#49454f] text-xs font-bold uppercase tracking-widest mb-3">Custom Message</Text>
                 <TextInput
                   value={message}
                   onChangeText={setMessage}
                   placeholder="Tell the finder how to help..."
                   multiline
                   numberOfLines={4}
-                  className="bg-gray-50 p-5 rounded-2xl text-lg text-black border border-gray-100 h-32"
+                  className="bg-[#f3f4f9] p-4 rounded-xl text-lg text-[#1c1b1f] h-32"
                   textAlignVertical="top"
+                  placeholderTextColor="#93909a"
                 />
               </View>
 
-              <View className="p-4 bg-red-50 rounded-2xl border border-red-100 flex-row">
-                <MaterialCommunityIcons name="shield-check" size={20} color="#ff3b30" />
-                <Text className="ml-3 text-red-600 text-xs flex-1 leading-4">
+              {/* Security Info Card */}
+              <View className="p-5 bg-[#fce8e6] rounded-[28px] border border-[#f9dad7] flex-row">
+                <MaterialCommunityIcons name="shield-check" size={20} color="#ba1a1a" />
+                <Text className="ml-3 text-[#410002] text-xs flex-1 leading-4 font-medium">
                   Once enabled, your tag will advertise a secure ID. When scanned by the NovaTag network, you'll receive a push notification with its location.
                 </Text>
               </View>
