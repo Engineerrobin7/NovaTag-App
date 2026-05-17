@@ -51,21 +51,29 @@ export default function SafeZoneScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-[#f7f9fc]"> {/* Material 3 Surface Tone */}
       <StatusBar style="dark" />
       <SafeAreaView className="flex-1" edges={["top"]}>
-        <View className="px-6 flex-row justify-between items-center h-16">
-          <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center">
-            <MaterialCommunityIcons name="close" size={28} color="black" />
+        {/* Material 3 Large Top App Bar */}
+        <View className="px-6 flex-row justify-between items-center h-20">
+          <Pressable 
+            onPress={() => router.back()} 
+            className="w-12 h-12 items-center justify-center rounded-full bg-white shadow-sm"
+          >
+            <MaterialCommunityIcons name="close" size={24} color="#1c1b1f" />
           </Pressable>
-          <Text className="text-black text-xl font-bold">New Safe Zone</Text>
-          <Pressable onPress={handleSave} className="bg-primary px-4 py-2 rounded-xl">
+          <Text className="text-[#1c1b1f] text-2xl font-semibold">New Safe Zone</Text>
+          <Pressable 
+            onPress={handleSave} 
+            className="bg-[#0066cc] px-6 py-3 rounded-full shadow-md"
+          >
             <Text className="text-white font-bold">Save</Text>
           </Pressable>
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-          <View className="h-80 w-full bg-gray-100 mb-6">
+          {/* Map Section with Material 3 card style */}
+          <View className="mx-6 h-80 rounded-[28px] overflow-hidden bg-white shadow-sm mb-6">
             <MapView
               className="flex-1"
               initialRegion={{
@@ -76,8 +84,8 @@ export default function SafeZoneScreen() {
               onPress={(e) => setLocation(e.nativeEvent.coordinate)}
             >
               <Marker coordinate={location} draggable onDragEnd={(e) => setLocation(e.nativeEvent.coordinate)}>
-                <View className="w-8 h-8 rounded-full bg-primary border-4 border-white shadow-lg items-center justify-center">
-                  <MaterialCommunityIcons name="home" size={16} color="white" />
+                <View className="w-10 h-10 rounded-full bg-[#0066cc] border-4 border-white shadow-lg items-center justify-center">
+                  <MaterialCommunityIcons name="home" size={18} color="white" />
                 </View>
               </Marker>
               <Circle
@@ -87,46 +95,50 @@ export default function SafeZoneScreen() {
                 fillColor="rgba(0, 102, 204, 0.1)"
               />
             </MapView>
-            <View className="absolute bottom-4 left-4 right-4 bg-white/90 p-3 rounded-2xl border border-white/20">
-              <Text className="text-gray-500 text-xs font-bold uppercase text-center">Tap or drag to set center</Text>
+            <View className="absolute bottom-4 left-4 right-4 bg-white/90 p-3 rounded-full border border-white/20">
+              <Text className="text-[#49454f] text-xs font-medium text-center">Tap or drag to set center</Text>
             </View>
           </View>
 
-          <View className="px-8">
-            <Animated.View entering={FadeInDown.delay(100)} className="mb-8">
-              <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Zone Name</Text>
+          <View className="px-6">
+            {/* Input Section - Material 3 Style */}
+            <Animated.View entering={FadeInDown.delay(100)} className="mb-6 bg-white p-6 rounded-[28px] shadow-sm">
+              <Text className="text-[#49454f] text-xs font-bold uppercase tracking-widest mb-3">Zone Name</Text>
               <TextInput
-                className="bg-gray-50 p-5 rounded-2xl text-lg text-black border border-gray-100"
+                className="bg-[#f3f4f9] p-4 rounded-xl text-lg text-[#1c1b1f]"
                 value={name}
                 onChangeText={setName}
                 placeholder="e.g. Home, Office, Park"
+                placeholderTextColor="#93909a"
               />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(200)} className="mb-8">
-              <View className="flex-row justify-between items-end mb-3">
-                <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest">Radius</Text>
-                <Text className="text-primary font-bold">{radius}m</Text>
+            {/* Radius Section - Material 3 Style */}
+            <Animated.View entering={FadeInDown.delay(200)} className="mb-6 bg-white p-6 rounded-[28px] shadow-sm">
+              <View className="flex-row justify-between items-end mb-4">
+                <Text className="text-[#49454f] text-xs font-bold uppercase tracking-widest">Radius</Text>
+                <Text className="text-[#0066cc] font-bold text-lg">{radius}m</Text>
               </View>
               <View className="flex-row items-center justify-between">
                 {[100, 200, 500, 1000].map((val) => (
                   <Pressable 
                     key={val}
                     onPress={() => setRadius(val)}
-                    className={`px-4 py-3 rounded-xl border ${radius === val ? "bg-primary border-primary" : "bg-white border-gray-100"}`}
+                    className={`px-5 py-3 rounded-full border ${radius === val ? "bg-[#0066cc] border-[#0066cc]" : "bg-[#f3f4f9] border-transparent"}`}
                   >
-                    <Text className={`font-bold ${radius === val ? "text-white" : "text-gray-400"}`}>{val}m</Text>
+                    <Text className={`font-bold ${radius === val ? "text-white" : "text-[#49454f]"}`}>{val}m</Text>
                   </Pressable>
                 ))}
               </View>
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(300)} className="mb-8 bg-blue-50 p-6 rounded-3xl border border-blue-100">
+            {/* Info Card - Material 3 Style */}
+            <Animated.View entering={FadeInDown.delay(300)} className="mb-8 bg-[#e8f0fe] p-6 rounded-[28px] border border-[#c2e7ff]">
               <View className="flex-row items-center mb-2">
-                <MaterialCommunityIcons name="bell-ring-outline" size={20} color={colors.primary} />
-                <Text className="ml-2 text-primary font-bold text-lg">Smart Alert</Text>
+                <MaterialCommunityIcons name="bell-ring-outline" size={24} color="#0066cc" />
+                <Text className="ml-2 text-[#0066cc] font-bold text-lg">Smart Alert</Text>
               </View>
-              <Text className="text-blue-900/60 leading-5">
+              <Text className="text-[#041e49] leading-5">
                 You will receive a critical notification if <Text className="font-bold">{device?.name || "the tag"}</Text> leaves this {radius}m perimeter.
               </Text>
             </Animated.View>

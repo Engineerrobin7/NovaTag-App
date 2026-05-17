@@ -7,6 +7,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDeviceStore } from "@store/useDeviceStore";
 import { useToastStore } from "@store/useToastStore";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { database } from "../services/firebase";
+import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
+import nacl from "tweetnacl";
 
 export default function LostModeScreen() {
   const router = useRouter();
@@ -18,6 +21,53 @@ export default function LostModeScreen() {
   const [isLost, setIsLost] = useState(device?.status === "lost");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [message, setMessage] = useState("If found, please contact me. I've lost my keys.");
+  const [foundLocation, setFoundLocation] = useState<{latitude: number, longitude: number} | null>(null);
+
+  function bytesToString(bytes: Uint8Array) {
+    let str = '';
+    for (let i = 0; i < bytes.length; i++) {
+      str += String.fromCharCode(bytes[i]);
+    }
+    return str;
+  }
+
+  useEffect(() => {
+    if (isLost && deviceId) {
+      const fetchLocation = async () => {
+        try {
+          const q = query(
+            collection(database, "location_reports"),
+            where("publicKeyHash", "==", deviceId),
+            orderBy("timestamp", "desc"),
+            limit(1)
+          );
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0].data();
+            const { nonce, ephemeralPublicKey, box } = doc.encryptedData;
+            
+            // Decrypt
+            const mockTagPrivateKey = new Uint8Array(32); // zeros
+            
+            const nonceBytes = new Uint8Array(nonce);
+            const pubKeyBytes = new Uint8Array(ephemeralPublicKey);
+            const boxBytes = new Uint8Array(box);
+            
+            const decrypted = nacl.box.open(boxBytes, nonceBytes, pubKeyBytes, mockTagPrivateKey);
+            
+            if (decrypted) {
+              const locationStr = bytesToString(decrypted);
+              const location = JSON.parse(locationStr);
+              setFoundLocation(location);
+            }
+          }
+        } catch (e) {
+          console.error("Error fetching location:", e);
+        }
+      };
+      fetchLocation();
+    }
+  }, [isLost, deviceId]);
 
   const handleToggle = async (value: boolean) => {
     setIsLost(value);
@@ -70,6 +120,17 @@ export default function LostModeScreen() {
 
           {isLost && (
             <Animated.View entering={FadeInDown} className="space-y-6">
+              {foundLocation && (
+                <View className="p-4 bg-green-50 rounded-2xl border border-green-100 flex-row items-center mb-2">
+                  <MaterialCommunityIcons name="map-marker-radius" size={24} color="#34c759" />
+                  <View className="ml-3 flex-1">
+                    <Text className="text-green-800 font-bold">Location Found by Network!</Text>
+                    <Text className="text-green-600 text-xs">
+                      Lat: {foundLocation.latitude.toFixed(4)}, Lng: {foundLocation.longitude.toFixed(4)}
+                    </Text>
+                  </View>
+                </View>
+              )}
               <View>
                 <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest ml-1 mb-3">Recovery Phone</Text>
                 <TextInput

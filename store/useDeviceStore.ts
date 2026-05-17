@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { NovaTagDevice, SmartAlert, SafeZone } from "../types";
 import { database } from "@services/firebase";
 import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, addDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { syncGeofencesWithStore } from "@services/geofencingService";
 
 type DeviceState = {
   devices: NovaTagDevice[];
@@ -102,6 +103,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           safeZones: [...(d.safeZones || []), zone]
         } : d)
       }));
+      
+      // Sync with OS geofencing
+      await syncGeofencesWithStore();
     } catch (e) {
       console.error("Failed to add safe zone:", e);
     }
@@ -126,6 +130,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           safeZones: d.safeZones?.filter(z => z.id !== zoneId)
         } : d)
       }));
+      
+      // Sync with OS geofencing
+      await syncGeofencesWithStore();
     } catch (e) {
       console.error("Failed to remove safe zone:", e);
     }

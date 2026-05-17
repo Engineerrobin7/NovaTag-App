@@ -10,6 +10,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { Toast } from "@components/Toast";
 import { ErrorBoundary } from "@components/ErrorBoundary";
+import { startBackgroundScanning } from "../services/findMyService";
+import { syncGeofencesWithStore } from "../services/geofencingService";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +25,13 @@ export default function Layout() {
       SplashScreen.hideAsync();
     }
   }, [loaded, error]);
+
+  useEffect(() => {
+    if (loaded) {
+      startBackgroundScanning();
+      syncGeofencesWithStore();
+    }
+  }, [loaded]);
 
   if (!loaded && !error) {
     return null;
