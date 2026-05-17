@@ -17,21 +17,12 @@ pluginManagement {
   includeBuild(expoPluginsPath)
 }
 
-// Disable Gradle toolchain auto-provisioning.
-// Gradle 8 + Kotlin plugin 2.x tries to download Java 17 via foojay.
-// We have JDK 25 installed — tell Gradle to use it and stop trying to download.
-toolchainManagement {
-  jvm {
-    javaRepositories {
-      // No remote repositories — use only locally installed JDKs
-    }
-  }
-}
-
 plugins {
   id("com.facebook.react.settings")
   id("expo-autolinking-settings")
 }
+
+// Enabled default toolchain management by removing the restriction.
 
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   if (System.getenv('EXPO_USE_COMMUNITY_AUTOLINKING') == '1') {
